@@ -32,23 +32,28 @@ public class PuzzleChecker {
 
     public static void main(String[] args) {
 
-        // for each command-line argument
-        for (String filename : args) {
-
-            // read in the board specified in the filename
-            In in = new In(filename);
-            int n = in.readInt();
-            int[][] tiles = new int[n][n];
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < n; j++) {
-                    tiles[i][j] = in.readInt();
-                }
-            }
-
-            // solve the slider puzzle
-            Board initial = new Board(tiles);
-            Solver solver = new Solver(initial);
-            StdOut.println(filename + ": " + solver.moves());
-        }
+        int[] a = {1, 2, 3, 4, 5};
+        int[] b = {1, 2, 3, 4, 5};
+        int[] c = {1, 4, 3, 4, 5};
+        System.out.println(a.equals(b));
+        System.out.println(a == b);
+//        // for each command-line argument
+//        for (String filename : args) {
+//
+//            // read in the board specified in the filename
+//            In in = new In(filename);
+//            int n = in.readInt();
+//            int[][] tiles = new int[n][n];
+//            for (int i = 0; i < n; i++) {
+//                for (int j = 0; j < n; j++) {
+//                    tiles[i][j] = in.readInt();
+//                }
+//            }
+//
+//            // solve the slider puzzle
+//            Board initial = new Board(tiles);
+//            Solver solver = new Solver(initial);
+//            StdOut.println(filename + ": " + solver.moves());
+//        }
     }
 }
