@@ -1,17 +1,19 @@
+import java.util.Arrays;
+
 public class Board {
     private int n;
-    private int[] board;
+    private int[] tilesTo1D;
     private int[][] tiles;
     private Board goalBoard;
 
     public Board(int[][] blocks) {
         tiles = blocks;
         n = blocks.length;
-        board = new int[n * n];
+        tilesTo1D = new int[n * n];
         int i = 0;
         for (int[] block : blocks) {
             for (int node : block) {
-                board[i++] = node;
+                tilesTo1D[i++] = node;
             }
         }
         createGoal();
@@ -44,16 +46,26 @@ public class Board {
         return this.equals(goalBoard);
     }
 
-    // a board that is obtained by exchanging any pair of blocks
+    // a tilesTo1D that is obtained by exchanging any pair of blocks
     public Board twin() {
-        return null;
+        int[][] twinTiles = Arrays.ctiles;
+        for (int i = 0; i < n * n - 1; i++) {
+            goalTiles[i / n][i - n * i / n] = i + 1;
+        }
+        goalTiles[n - 1][n - 1] = 0;
+        goalBoard = new Board(goalTiles);
+        if (tiles.[0][0] != 0 && tiles.[0][1] != 0){
+
+        }
+        Board twin = new Board(twinTiles);
+        return twin;
     }
 
     public boolean equals(Object y) {
         Board otherBoard = (Board) y;
-        if (board.length != otherBoard.board.length) return false;
-        for (int i = 0; i < board.length; i++){
-            if (board[i] != otherBoard.board[i]) return false;
+        if (tilesTo1D.length != otherBoard.tilesTo1D.length) return false;
+        for (int i = 0; i < tilesTo1D.length; i++){
+            if (tilesTo1D[i] != otherBoard.tilesTo1D[i]) return false;
         }
         return true;
     }
@@ -63,7 +75,7 @@ public class Board {
         return null;
     }
 
-    // string representation of this board (in the output format specified below)
+    // string representation of this tilesTo1D (in the output format specified below)
     public String toString() {
         StringBuilder s = new StringBuilder();
         s.append(n + "\n");
