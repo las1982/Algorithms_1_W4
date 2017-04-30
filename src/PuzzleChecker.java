@@ -34,28 +34,37 @@ public class PuzzleChecker {
 
     public static void main(String[] args) {
 
-        int[][] a = {{1, 2, 3},{4, 5, 6}};
-        int[][] b = {{1, 2, 3},{4, 5, 6}};
-        int[] c = {1, 4, 3, 4, 5};
-        System.out.println(Arrays.deepEquals(a, b));
-        System.out.println();
-//        // for each command-line argument
-//        for (String filename : args) {
-//
-//            // read in the board specified in the filename
-//            In in = new In(filename);
-//            int n = in.readInt();
-//            int[][] tiles = new int[n][n];
-//            for (int i = 0; i < n; i++) {
-//                for (int j = 0; j < n; j++) {
-//                    tiles[i][j] = in.readInt();
-//                }
-//            }
-//
-//            // solve the slider puzzle
-//            Board initial = new Board(tiles);
+//        int[][] a = {{1, 2, 3},{4, 5, 6}};
+//        int[][] b = {{1, 2, 3},{4, 5, 6}};
+//        int[] c = {1, 4, 3, 4, 5};
+//        System.out.println(Arrays.deepEquals(a, b));
+//        System.out.println();
+
+        // for each command-line argument
+        for (String filename : args) {
+
+            // read in the board specified in the filename
+            In in = new In(filename);
+            int n = in.readInt();
+            int[][] tiles = new int[n][n];
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    tiles[i][j] = in.readInt();
+                }
+            }
+
+            // solve the slider puzzle
+            Board initial = new Board(tiles);
+            StdOut.println(initial.toString());
+            StdOut.println(initial.dimension());
+            StdOut.println(initial.hamming());
+            StdOut.println(initial.manhattan());
+            StdOut.println(initial.isGoal());
+            StdOut.println(initial.neighbors());
+            StdOut.println(initial.twin());
+
 //            Solver solver = new Solver(initial);
 //            StdOut.println(filename + ": " + solver.moves());
-//        }
+        }
     }
 }

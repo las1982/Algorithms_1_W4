@@ -1,25 +1,14 @@
 import java.util.Arrays;
+import java.util.Iterator;
 
 public class Board {
     private int n;
-    private int[] tilesTo1D;
     private int[][] tiles;
     private Board goalBoard;
 
     public Board(int[][] blocks) {
         tiles = blocks;
         n = blocks.length;
-        tilesTo1D = new int[n * n];
-        int i = 0;
-        for (int[] block : blocks) {
-            for (int node : block) {
-                tilesTo1D[i++] = node;
-            }
-        }
-        createGoal();
-    }
-
-    private void createGoal() {
         int[][] goalTiles = new int[n][n];
         for (int i = 0; i < n * n - 1; i++) {
             goalTiles[i / n][i - n * i / n] = i + 1;
@@ -82,24 +71,51 @@ public class Board {
     }
 
     public Iterable<Board> neighbors() {
-        Board[] neighbors;
-        int i = 0, item1, item2, row, col, blankRow, blankCol;
+        int[][] neighborsTiles, neighborsIndex = new int[4][2];
+        int i = 0, item1, item2, row = 0, col = 0, blankRow = 0, blankCol = 0, neighborsLength = 4;
         while (i < n * n - 1) {
             row = i / n;
             col = i - n * i / n;
-            if (tiles[row][col] == 0){
+            if (tiles[row][col] == 0) {
                 blankRow = row;
                 blankCol = col;
+                if (row == 0 || row == n - 1) neighborsLength--;
+                if (col == 0 || col == n - 1) neighborsLength--;
+                neighborsIndex = new int[][]{{row + 1, col}, {row - 1, col}, {row, col - 1}, {row, col + 1}};
             }
         }
-        i = 0;
-        while (i < n * n - 1) {
-            row = i / n;
-            col = i - n * i / n;
-
+        Board[] neighbors = new Board[neighborsLength];
+        for (int[] index : neighborsIndex) {
+            if (index[0] >= 0 && index[0] < n && index[1] >= 0 && index[1] < n) {
+                neighborsTiles = tiles;
+                neighborsTiles[blankRow][blankCol] = tiles[index[0]][index[1]];
+                neighbors[neighborsLength-- - 1] = new Board(neighborsTiles);
+            }
         }
 
-        return null;
+        return new Iterable<Board>() {
+            @Override
+            public Iterator<Board> iterator() {
+                return new Iterator<Board>() {
+                    private int position;
+
+                    @Override
+                    public boolean hasNext() {
+                        return position != neighbors.length;
+                    }
+
+                    @Override
+                    public Board next() {
+                        if (!hasNext()) throw new java.util.NoSuchElementException();
+                        return neighbors[position++];
+                    }
+                    @Override
+                    public void remove() {
+                        throw new UnsupportedOperationException("remove operation is forbidden");
+                    }
+                };
+            }
+        };
     }
 
     // string representation of this tilesTo1D (in the output format specified below)
@@ -113,10 +129,6 @@ public class Board {
             s.append("\n");
         }
         return s.toString();
-    }
-
-    // unit tests (not graded)
-    public static void main(String[] args) {
     }
 }
 
