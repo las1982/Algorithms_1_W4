@@ -28,15 +28,17 @@
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdOut;
 
+import java.util.Arrays;
+
 public class PuzzleChecker {
 
     public static void main(String[] args) {
 
-        int[] a = {1, 2, 3, 4, 5};
-        int[] b = {1, 2, 3, 4, 5};
+        int[][] a = {{1, 2, 3},{4, 5, 6}};
+        int[][] b = {{1, 2, 3},{4, 5, 6}};
         int[] c = {1, 4, 3, 4, 5};
-        System.out.println(a.equals(b));
-        System.out.println(a == b);
+        System.out.println(Arrays.deepEquals(a, b));
+        System.out.println();
 //        // for each command-line argument
 //        for (String filename : args) {
 //
