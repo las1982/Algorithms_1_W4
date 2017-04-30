@@ -5,14 +5,15 @@ import edu.princeton.cs.algs4.StdOut;
 import java.util.Comparator;
 import java.util.Iterator;
 
-public class Solver {
+public class Solver1 {
     private Board[] solutions = new Board[2];
     private boolean isSolvable = true;
     private int moves = 0;
 
-    public Solver(Board initial) {
+    public Solver1(Board initial) {
 
         MinPQ<Board> pq = new MinPQ<Board>(new BoardComparator());
+        pq.insert(initial);
         solutions[moves] = initial;
         Board bestBoard;
         boolean isGoal = initial.isGoal();
@@ -21,24 +22,27 @@ public class Solver {
 //            int n = 0;
             for (Board neighbor : neighbors) {
 //System.out.println("neighbor: " + ++n + "\n" + neighbor.toString());
-                if (neighbor.equals(initial.twin())) {
-//System.out.println("neighbor == twin: " + neighbor.toString());
-//System.out.println("twin: " + initial.twin().toString());
-//System.out.println(neighbor.equals(initial.twin()));
-                    isSolvable = false;
-                    return;
-                }
+//                if (neighbor.equals(initial.twin())) {
+//                    isSolvable = false;
+//                    return;
+//                }
                 pq.insert(neighbor);
             }
-            bestBoard = pq.delMin();
-//System.out.println("best board: \n" + bestBoard.toString());
+            bestBoard = pq.min();
+System.out.println("best board: \n" + bestBoard.toString());
             neighbors = bestBoard.neighbors();
-            if (moves == solutions.length - 1) resizeSolutions();
-            solutions[++moves] = bestBoard;
             isGoal = bestBoard.isGoal();
 //System.out.println(pq.size());
 //System.out.println(bestBoard.toString());
 //            if (moves == 15) break;
+        }
+        while (true){
+            if (moves == solutions.length - 1) resizeSolutions();
+            if (!pq.min().equals(initial)){
+                solutions[++moves] = pq.delMin();
+            } else {
+                break;
+            }
         }
     }
 
@@ -56,11 +60,12 @@ public class Solver {
         public int compare(Board board1, Board board2) {
             int man1 = board1.manhattan() + moves;
             int man2 = board2.manhattan() + moves;
-//            int ham1 = board1.hamming() + moves;
-//            int ham2 = board2.hamming() + moves;
+            int ham1 = board1.hamming() + moves;
+            int ham2 = board2.hamming() + moves;
             if (man1 < man2) return -1;
-            else if (man1 == man2) return 0;
+            else if (man1 == man2 && ham1 < ham2) return -1;
             else if (man1 > man2) return 1;
+            else if (man1 == man2 && ham1 > ham2) return 1;
             else return 0;
         }
     }
@@ -118,7 +123,6 @@ public class Solver {
             }
 
             // solve the slider puzzle
-//            int[][] tiles = new int[][] {{0, 1, 3}, {4, 2, 5}, {7, 8, 6}};
             Board initial = new Board(tiles);
             StdOut.println("initial: " + initial.toString());
 //            StdOut.println(initial.dimension());
@@ -130,7 +134,7 @@ public class Solver {
 //                StdOut.println(naighbor.toString());
 //            }
 
-            Solver solver = new Solver(initial);
+            Solver1 solver = new Solver1(initial);
             StdOut.println(filename + ": " + solver.moves());
         }
     }
