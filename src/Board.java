@@ -3,7 +3,7 @@ import java.util.Iterator;
 
 public class Board {
     private int n;
-    int[][] tiles;
+    private int[][] tiles;
     private Board[] neighbors;
     private int[][] goalTiles;
 
@@ -71,7 +71,6 @@ public class Board {
             if (col < n - 1) {
                 item1 = twinTiles[row][col];
                 item2 = twinTiles[row][col + 1];
-//System.out.println("i=" + i + " row=" + row + " col=" + col + " item1=" + item1 + " item2=" + item2);
                 if (item1 != 0 && item2 != 0) {
                     twinTiles[row][col] = item2;
                     twinTiles[row][col + 1] = item1;
@@ -90,7 +89,6 @@ public class Board {
             row = i / n;
             col = i - n * row;
             if (tiles[row][col] == 0) {
-//System.out.println("i=" + i + " elem:" + tiles[row][col]);
                 blankRow = row;
                 blankCol = col;
                 if (row == 0 || row == n - 1) neighborsLength--;
@@ -99,8 +97,6 @@ public class Board {
             }
             i++;
         }
-//System.out.println("tiles: " + Arrays.toString(tiles[0]) + Arrays.toString(tiles[1]) + Arrays.toString(tiles[2]));
-//System.out.println(blankRow + " " + blankCol + " ");
         neighbors = new Board[neighborsLength];
         for (int[] index : neighborsIndex) {
             if (index[0] >= 0 && index[0] < n && index[1] >= 0 && index[1] < n) {
@@ -134,8 +130,6 @@ public class Board {
 
     public boolean equals(Object other) {
         if (other == this) return true;
-//        System.out.println("*********" + other.toString());
-//        System.out.println("---------" + this.toString());
         if (other == null) return false;
         if (other.getClass() != this.getClass()) return false;
         Board that = (Board) other;
@@ -144,7 +138,6 @@ public class Board {
 
     public String toString() {
         StringBuilder s = new StringBuilder();
-//        s.append("size: " + n + " manhatten: " + this.manhattan() + " hamming: " + this.hamming() + "\n");
         s.append(n + "\n");
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {

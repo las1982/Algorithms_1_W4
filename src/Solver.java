@@ -6,56 +6,42 @@ import java.util.Comparator;
 import java.util.Iterator;
 
 public class Solver {
-    private Board[] solutions = new Board[2];
+    private Comparator<Board> boardComparator = new BoardComparator();
+    private MinPQ<Board> solutions = new MinPQ<Board>(boardComparator);
+    private MinPQ<Board> pq = new MinPQ<Board>(boardComparator);
     private boolean isSolvable = true;
     private int moves = 0;
 
     public Solver(Board initial) {
 
-        MinPQ<Board> pq = new MinPQ<Board>(new BoardComparator());
-        solutions[moves] = initial;
         Board bestBoard;
         boolean isGoal = initial.isGoal();
         Iterable<Board> neighbors = initial.neighbors();
         while (!isGoal) {
-//            int n = 0;
             for (Board neighbor : neighbors) {
-//System.out.println("neighbor: " + ++n + "\n" + neighbor.toString());
                 if (neighbor.equals(initial.twin())) {
-//System.out.println("neighbor == twin: " + neighbor.toString());
-//System.out.println("twin: " + initial.twin().toString());
-//System.out.println(neighbor.equals(initial.twin()));
                     isSolvable = false;
                     return;
                 }
+                if (initial.equals(neighbor)) continue;
                 pq.insert(neighbor);
             }
             bestBoard = pq.delMin();
-//System.out.println("best board: \n" + bestBoard.toString());
             neighbors = bestBoard.neighbors();
-            if (moves == solutions.length - 1) resizeSolutions();
-            solutions[++moves] = bestBoard;
+            solutions.insert(bestBoard);
+            moves++;
             isGoal = bestBoard.isGoal();
-//System.out.println(pq.size());
-//System.out.println(bestBoard.toString());
-//            if (moves == 15) break;
         }
-    }
-
-    private void resizeSolutions() {
-        Board[] tempSolutions = new Board[solutions.length * 2];
-        for (int i = 0; i < solutions.length; i++) {
-            tempSolutions[i] = solutions[i];
-        }
-        solutions = tempSolutions;
     }
 
     private class BoardComparator implements Comparator<Board> {
 
         @Override
         public int compare(Board board1, Board board2) {
-            int man1 = board1.manhattan() + moves;
-            int man2 = board2.manhattan() + moves;
+            int man1 = board1.manhattan();
+            man1 = man1 + moves;
+            int man2 = board2.manhattan();
+            man2 = man2 + moves;
 //            int ham1 = board1.hamming() + moves;
 //            int ham2 = board2.hamming() + moves;
             if (man1 < man2) return -1;
@@ -71,29 +57,30 @@ public class Solver {
 
     public int moves() {
         if (!isSolvable()) return -1;
-        return moves;
+        return solutions.size();
     }
 
     public Iterable<Board> solution() {
         if (!isSolvable()) return null;
-        return new Iterable<Board>() {
-            public Iterator<Board> iterator() {
-                return new Iterator<Board>() {
-                    private int position;
-                    public boolean hasNext() {
-                        return position != solutions.length;
-                    }
-                    public Board next() {
-                        if (!hasNext()) throw new java.util.NoSuchElementException();
-                        return solutions[position++];
-                    }
-                    public void remove() {
-                        throw new UnsupportedOperationException("remove operation is forbidden");
-                    }
-                };
-            }
-        };
-
+        return solutions;
+//        return new Iterable<Board>() {
+//            public Iterator<Board> iterator() {
+//                return new Iterator<Board>() {
+//                    private int position;
+//                    public boolean hasNext() {
+//                        return position != solutions.size() && solutions.[position] != null;
+//                    }
+//                    public Board next() {
+//                        if (!hasNext()) throw new java.util.NoSuchElementException();
+//                        return solutions[position++];
+//                    }
+//                    public void remove() {
+//                        throw new UnsupportedOperationException("remove operation is forbidden");
+//                    }
+//                };
+//            }
+//        };
+//
     }
 
     public static void main(String[] args) {
