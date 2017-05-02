@@ -8,14 +8,17 @@ public class Solver {
     private ArrayList<Board> solutions = new ArrayList<Board>();
     private MinPQ<Board> pq = new MinPQ<Board>(boardComparator);
     private boolean isSolvable = true;
-    private int moves = 0;
+    private int moves;
 
     public Solver(Board initial) {
 
         boolean isGoal = initial.isGoal();
-        Iterable<Board> neighbors = initial.neighbors();
         solutions.add(initial);
+        moves = 0;
         Board bestBoard = initial;
+        Iterable<Board> neighbors = initial.neighbors();
+System.out.println("best board: " + bestBoard.toString() + "neighbors: ");
+for (Board nb : neighbors) System.out.println(nb.toString());
         while (!isGoal) {
             for (Board neighbor : neighbors) {
                 if (neighbor.equals(initial.twin()) || moves == 10000) {
@@ -43,8 +46,10 @@ public class Solver {
             moves++;
             if (pq.size() != 0){
                 bestBoard = pq.min();
-                bestBoard = pq.delMin();
                 neighbors = bestBoard.neighbors();
+System.out.println("best board: " + bestBoard.toString() + "neighbors: ");
+for (Board nb : neighbors) System.out.println(nb.toString());
+                bestBoard = pq.delMin();
                 solutions.add(bestBoard);
                 isGoal = bestBoard.isGoal();
             } else continue;
