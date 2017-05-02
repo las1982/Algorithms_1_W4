@@ -6,6 +6,9 @@ public class Board {
     private int[][] tiles;
     private Board[] neighbors;
     private int[][] goalTiles;
+    private int manhattan;
+    private int hamming;
+    private Board twin;
 
     public Board(int[][] blocks) {
         tiles = blocks;
@@ -17,14 +20,15 @@ public class Board {
             goalTiles[row][col] = i + 1;
         }
         goalTiles[n - 1][n - 1] = 0;
+        setCost();
     }
 
     public int dimension() {
         return n;
     }
 
-    private int getCost(String what) {
-        int row, col, goalRow, goalCol, goalI, manhattan = 0, hamming = 0;
+    private void setCost() {
+        int row, col, goalRow, goalCol, goalI;
         for (int i = 0; i < n * n; i++) {
             row = i / n;
             col = i - n * row;
@@ -37,17 +41,14 @@ public class Board {
                 hamming++;
             }
         }
-        if (what.equals("manhattan")) return manhattan;
-        if (what.equals("hamming")) return hamming;
-        return 0;
     }
 
     public int hamming() {
-        return getCost("hamming");
+        return hamming;
     }
 
     public int manhattan() {
-        return getCost("manhattan");
+        return manhattan;
     }
 
     public boolean isGoal() {
@@ -74,7 +75,8 @@ public class Board {
                 if (item1 != 0 && item2 != 0) {
                     twinTiles[row][col] = item2;
                     twinTiles[row][col + 1] = item1;
-                    return new Board(twinTiles);
+                    twin = new Board(twinTiles);
+                    return twin;
                 }
             }
             i++;
@@ -149,7 +151,7 @@ public class Board {
     }
 
     public static void main(String[] args) {
-        Board b = new Board(new int[][]{{0, 1, 3}, {4, 2, 5}, {7, 8, 6}});
+        Board b = new Board(new int[][]{{0, 1, 3}, {4, 2, 6}, {7, 5, 8}});
         Board bg = new Board(new int[][]{{0, 3, 1}, {4, 2, 5}, {7, 8, 6}});
 //        Board bg1 = new Board(new int[][] {{5, 0, 4}, {2, 3, 8}, {7, 1, 6}});
         System.out.println(b.toString());
@@ -159,7 +161,7 @@ public class Board {
         System.out.println(Arrays.toString(bg.tiles[0]) + Arrays.toString(bg.tiles[1]) + Arrays.toString(bg.tiles[2]));
         System.out.println(Arrays.toString(bg.goalTiles[0]) + Arrays.toString(bg.goalTiles[1]) + Arrays.toString(bg.goalTiles[2]));
         System.out.println(bg.isGoal());
-        System.out.println(b.equals(bg));
+        System.out.println(b.manhattan());
 
     }
 }

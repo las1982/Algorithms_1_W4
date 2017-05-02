@@ -1,36 +1,53 @@
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.MinPQ;
 import edu.princeton.cs.algs4.StdOut;
-
-import java.util.Comparator;
-import java.util.Iterator;
+import java.util.*;
 
 public class Solver {
     private Comparator<Board> boardComparator = new BoardComparator();
-    private MinPQ<Board> solutions = new MinPQ<Board>(boardComparator);
+    private ArrayList<Board> solutions = new ArrayList<Board>();
     private MinPQ<Board> pq = new MinPQ<Board>(boardComparator);
     private boolean isSolvable = true;
     private int moves = 0;
 
     public Solver(Board initial) {
 
-        Board bestBoard;
         boolean isGoal = initial.isGoal();
         Iterable<Board> neighbors = initial.neighbors();
+        solutions.add(initial);
+        Board bestBoard = initial;
         while (!isGoal) {
             for (Board neighbor : neighbors) {
-                if (neighbor.equals(initial.twin())) {
+                if (neighbor.equals(initial.twin()) || moves == 10000) {
                     isSolvable = false;
-                    return;
+                    isGoal = true;
+                    break;
                 }
+                boolean neighborInSolution = false;
                 if (initial.equals(neighbor)) continue;
-                pq.insert(neighbor);
+                if (bestBoard.equals(neighbor)) continue;
+                for (Board solution : solutions){
+                    if (neighbor.equals(solution)) {
+                        neighborInSolution = true;
+                        break;
+                    }
+                }
+                for (Board prq : pq){
+                    if (neighbor.equals(prq)) {
+                        neighborInSolution = true;
+                        break;
+                    }
+                }
+                if (!neighborInSolution) pq.insert(neighbor);
             }
-            bestBoard = pq.delMin();
-            neighbors = bestBoard.neighbors();
-            solutions.insert(bestBoard);
             moves++;
-            isGoal = bestBoard.isGoal();
+            if (pq.size() != 0){
+                bestBoard = pq.min();
+                bestBoard = pq.delMin();
+                neighbors = bestBoard.neighbors();
+                solutions.add(bestBoard);
+                isGoal = bestBoard.isGoal();
+            } else continue;
         }
     }
 
@@ -57,30 +74,12 @@ public class Solver {
 
     public int moves() {
         if (!isSolvable()) return -1;
-        return solutions.size();
+        return moves;
     }
 
     public Iterable<Board> solution() {
         if (!isSolvable()) return null;
         return solutions;
-//        return new Iterable<Board>() {
-//            public Iterator<Board> iterator() {
-//                return new Iterator<Board>() {
-//                    private int position;
-//                    public boolean hasNext() {
-//                        return position != solutions.size() && solutions.[position] != null;
-//                    }
-//                    public Board next() {
-//                        if (!hasNext()) throw new java.util.NoSuchElementException();
-//                        return solutions[position++];
-//                    }
-//                    public void remove() {
-//                        throw new UnsupportedOperationException("remove operation is forbidden");
-//                    }
-//                };
-//            }
-//        };
-//
     }
 
     public static void main(String[] args) {
