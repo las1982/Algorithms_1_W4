@@ -16,7 +16,9 @@ public class LocalRun {
 //        System.out.println();
 
         // for each command-line argument
-        int[][] tiles = new int[][]{{0, 1, 2}, {7, 5, 4}, {8, 6, 3}};
+//        int[][] tiles = new int[][]{{0, 1, 3}, {4, 2, 5}, {7, 8, 6}}; // 4
+        int[][] tiles = new int[][]{{1, 2, 3}, {0, 7, 6}, {5, 4, 8}}; // 7
+//        int[][] tiles = new int[][]{{1, 0, 2}, {7, 5, 4}, {8, 6, 3}}; // 11
 //        int[][] tiles = new int[][]{{1, 0}, {2, 3}};
         Board initial = new Board(tiles);
         StdOut.println("initial: " + initial.toString());

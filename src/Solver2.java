@@ -1,9 +1,11 @@
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.MinPQ;
 import edu.princeton.cs.algs4.StdOut;
-import java.util.*;
 
-public class Solver {
+import java.util.ArrayList;
+import java.util.Comparator;
+
+public class Solver2 {
     private Comparator<Board> boardComparator = new BoardComparator();
     private ArrayList<Board> solutions = new ArrayList<Board>();
     private MinPQ<Board> pq = new MinPQ<Board>(boardComparator);
@@ -11,11 +13,13 @@ public class Solver {
     private int moves = 0;
     private Iterable<Board> neighbors;
     private Board bestBoard;
+    private Board initBoard;
 
-    public Solver(Board initial) {
+    public Solver2(Board initial) {
 
-        if (initial == null) throw new java.lang.NullPointerException();
-        bestBoard = initial;
+        if (initial == null) throw new NullPointerException();
+        initBoard = initial;
+        bestBoard = initBoard;
         pq.insert(bestBoard);
         solutions.add(bestBoard);
         bestBoard = pq.delMin();
@@ -35,10 +39,11 @@ public class Solver {
         }
     }
 
-    private class BoardComparator implements Comparator<Board> {
+    private class BoardComparator implements Comparable<Board> {
 
         @Override
-        public int compare(Board board1, Board board2) {
+        public int compareTo(Board board2) {
+            Board board1 = this.;
             int cost1 = 0, cost2 = 0;
             cost1 = board1.manhattan();
             cost2 = board2.manhattan();
@@ -101,7 +106,7 @@ public class Solver {
 //                StdOut.println(naighbor.toString());
 //            }
 
-            Solver solver = new Solver(initial);
+            Solver2 solver = new Solver2(initial);
             StdOut.println(filename + ": " + solver.moves());
         }
     }
