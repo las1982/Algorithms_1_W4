@@ -1,113 +1,160 @@
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.MinPQ;
 import edu.princeton.cs.algs4.StdOut;
+import edu.princeton.cs.algs4.Stopwatch;
 
+import java.io.File;
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.List;
+import java.util.Stack;
 
+/**
+ * Created by Daniel on 16/07/15.
+ */
 public class Solver2 {
-    private Comparator<Board> boardComparator = new BoardComparator();
-    private ArrayList<Board> solutions = new ArrayList<Board>();
-    private MinPQ<Board> pq = new MinPQ<Board>(boardComparator);
-    private boolean isSolvable = true;
-    private int moves = 0;
-    private Iterable<Board> neighbors;
-    private Board bestBoard;
-    private Board initBoard;
+    private SearchNode finalNode;
 
+    private class SearchNode implements Comparable<SearchNode> {
+        private Board board;
+        private SearchNode pi;
+        private int cost;
+
+        private SearchNode(Board board, SearchNode pi, int cost) {
+            if (board == null)
+                throw new NullPointerException();
+
+            this.board = board;
+            this.pi = pi;
+            this.cost = cost;
+        }
+
+        public int compareTo(SearchNode o) {
+            return (this.cost + this.board.manhattan()) - (o.cost + o.board.manhattan());
+        }
+    }
+
+    /**
+     * find a solution to the initial board (using the A* algorithm)
+     *
+     * @param initial
+     */
     public Solver2(Board initial) {
+        if (initial == null)
+            throw new NullPointerException();
 
-        if (initial == null) throw new NullPointerException();
-        initBoard = initial;
-        bestBoard = initBoard;
-        pq.insert(bestBoard);
-        solutions.add(bestBoard);
-        bestBoard = pq.delMin();
-        neighbors = bestBoard.neighbors();
-        while (!bestBoard.isGoal()) {
-            for (Board neighbor : neighbors) {
-                if (moves == 0) pq.insert(neighbor);
-                else if (!neighbor.equals(solutions.get(moves - 1))) {
-//                    System.out.println(neighbor.toString() + solutions.get(moves - 1).toString());
-                    pq.insert(neighbor);
+        // solve the puzzle
+        List<MinPQ<SearchNode>> pqs = new ArrayList<MinPQ<SearchNode>>();
+        // List<Set<Board>> visits = new ArrayList<>();  // java array hash code using Object's; thus works poorly;
+
+        Board[] initials = new Board[]{initial, initial.twin()};
+        for (int i = 0; i < initials.length; i++) {
+            pqs.add(new MinPQ<SearchNode>());
+            pqs.get(i).insert(new SearchNode(initials[i], null, 0));
+        }
+        while (true) {
+            for (MinPQ pq : pqs)
+                if (pq.isEmpty())
+                    break;
+
+            for (int i = 0; i < initials.length; i++) {
+                SearchNode sn= pqs.get(0).min();
+                SearchNode cur = pqs.get(i).delMin();
+                if (cur.board.isGoal()) {
+                    if (i == 0)
+                        finalNode = cur;
+                    return;
+                }
+                for (Board nei : cur.board.neighbors()) {
+                    if (!(cur.pi != null && nei.equals(cur.pi.board))) {
+                        pqs.get(i).insert(new SearchNode(nei, cur, cur.cost + 1));
+                        pqs.get(i);
+                    }
                 }
             }
-            bestBoard = pq.delMin();
-            moves++;
-            neighbors = bestBoard.neighbors();
-            solutions.add(bestBoard);
         }
     }
 
-    private class BoardComparator implements Comparable<Board> {
-
-        @Override
-        public int compareTo(Board board2) {
-            Board board1 = this.;
-            int cost1 = 0, cost2 = 0;
-            cost1 = board1.manhattan();
-            cost2 = board2.manhattan();
-            cost1 = cost1 + moves;
-            cost2 = cost2 + moves;
-//            cost1 = cost1 + board1.hamming();
-//            cost2 = cost2 + board2.hamming();
-            if (cost1 < cost2) return -1;
-            else if (cost1 == cost2) return 0;
-            else if (cost1 > cost2) return 1;
-            else return 0;
-        }
-    }
-
+    /**
+     * is the initial board solvable?
+     *
+     * @return
+     */
     public boolean isSolvable() {
-        return isSolvable;
+        return this.finalNode != null;
     }
 
+    /**
+     * min number of moves to solve initial board; -1 if unsolvable
+     *
+     * @return
+     */
     public int moves() {
-        if (!isSolvable()) return -1;
-        return moves;
+        if (this.finalNode == null)
+            return -1;
+
+        return this.finalNode.cost;
     }
 
+    /**
+     * sequence of boards in a shortest solution; null if unsolvable
+     *
+     * @return
+     */
     public Iterable<Board> solution() {
-        if (!isSolvable()) return null;
-        return solutions;
+        if (this.finalNode == null)
+            return null;
+
+        Stack<Board> ret = new Stack<Board>();
+        for (SearchNode cur = finalNode; cur != null; cur = cur.pi) {
+//            System.out.println("**********************");
+            ret.push(cur.board);
+        }
+
+        return ret;
     }
 
+    /**
+     * solve a slider puzzle (given below)
+     *
+     * @param args
+     */
     public static void main(String[] args) {
-
-//        int[][] a = {{1, 2, 3},{4, 5, 6}};
-//        int[][] b = {{1, 2, 3},{4, 5, 6}};
-//        int[] c = {1, 4, 3, 4, 5};
-//        System.out.println(Arrays.deepEquals(a, b));
-//        System.out.println();
-
-        // for each command-line argument
-        for (String filename : args) {
-
-            // read in the board specified in the filename
-            In in = new In(filename);
-            int n = in.readInt();
-            int[][] tiles = new int[n][n];
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < n; j++) {
-                    tiles[i][j] = in.readInt();
-                }
+        Stopwatch w = new Stopwatch();
+        try {
+            // create initial board from file
+            File f;
+            if (args.length > 0)
+                f = new File(args[0]);
+            else {
+                String path = "8puzzle/puzzle36.txt";
+                // path = "8puzzle/puzzle4x4-unsolvable.txt";
+                f = new File(Solver.class.getResource(path).toURI());
             }
 
-            // solve the slider puzzle
-//            int[][] tiles = new int[][] {{0, 1, 3}, {4, 2, 5}, {7, 8, 6}};
-            Board initial = new Board(tiles);
-            StdOut.println("initial: " + initial.toString());
-//            StdOut.println(initial.dimension());
-//            StdOut.println(initial.hamming());
-//            StdOut.println(initial.manhattan());
-//            StdOut.println(initial.isGoal());
-//            StdOut.println(initial.twin());
-//            for (Board naighbor : initial.neighbors()) {
-//                StdOut.println(naighbor.toString());
-//            }
 
-            Solver2 solver = new Solver2(initial);
-            StdOut.println(filename + ": " + solver.moves());
+            In in = new In(f);
+            int N = in.readInt();
+            int[][] blocks = new int[N][N];
+            for (int i = 0; i < N; i++)
+                for (int j = 0; j < N; j++)
+                    blocks[i][j] = in.readInt();
+
+            Board initial = new Board(blocks);
+
+            // solve the puzzle
+            Solver solver = new Solver(initial);
+
+            // print solution to standard output
+            if (!solver.isSolvable())
+                StdOut.println("No solution possible");
+            else {
+                StdOut.println("Minimum number of moves = " + solver.moves());
+                for (Board board : solver.solution())
+                    StdOut.println(board);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        // System.out.println(w.elapsedTime());
     }
 }

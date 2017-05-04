@@ -31,8 +31,9 @@ public class LocalRun {
 //                StdOut.println(naighbor.toString());
 //            }
 
-        Solver solver = new Solver(initial);
+        Solver2 solver = new Solver2(initial);
         StdOut.println("steps: " + solver.moves());
+        StdOut.println(solver.solution().toString());
 //        StdOut.println("solution: " + solver.solution().toString());
     }
 }
